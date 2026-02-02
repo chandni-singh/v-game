@@ -187,7 +187,7 @@
       <p id="counter">0 / 8</p>
     `;
           let count = 0;
-          for (let i = 0; i < 8; i++) {
+          for (let i = 0; i < 10; i++) {
             const heart = document.createElement("span");
             heart.className = "item moving-heart";
             heart.innerText = "❤️";
@@ -198,8 +198,8 @@
               count++;
               dadScore += 5;
               updateScore();
-              document.getElementById("counter").innerText = `${count} / 8`;
-              if (count === 8) showGift("The fridge");
+              document.getElementById("counter").innerText = `${count} / 10`;
+              if (count === 10) showGift("The fridge");
             };
             game.appendChild(heart);
           }
@@ -227,7 +227,7 @@
             btn.onclick = () => {
               btn.innerText = n;
               btn.disabled = true;
-              dadScore += 5;
+              dadScore += 10;
               updateScore();
               if (
                 [...document.querySelectorAll("#notes button")].every(
