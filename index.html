@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dad Mode: Leveling Up</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(135deg, #ffb6c1, #ffe4e1);
+        text-align: center;
+        padding: 30px;
+        overflow-x: hidden;
+      }
+
+      .game-box {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 520px;
+        margin: auto;
+        margin-top: 200px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+      }
+
+      h2 {
+        color: #ff4f7b;
+      }
+
+      button,
+      input {
+        padding: 12px 20px;
+        border-radius: 20px;
+        border: none;
+        font-size: 16px;
+        margin: 8px;
+      }
+
+      button {
+        background: #ff4f7b;
+        color: white;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #ff2f66;
+      }
+
+      .score,
+      .progress {
+        font-weight: bold;
+        color: #ff2f66;
+        margin-bottom: 10px;
+      }
+
+      .item {
+        font-size: 40px;
+        margin: 10px;
+        cursor: pointer;
+      }
+
+      .moving-heart {
+        position: absolute;
+        animation: float 4s linear infinite;
+      }
+      @keyframes float {
+        0% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-40px);
+        }
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      .confetti {
+        position: fixed;
+        top: -10px;
+        font-size: 24px;
+        animation: fall 4s linear infinite;
+      }
+      @keyframes fall {
+        to {
+          transform: translateY(110vh);
+          opacity: 0;
+        }
+      }
+
+      .small {
+        font-size: 14px;
+        color: #777;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="game-box">
+      <div class="score" id="score">Dad Score: 0 👑</div>
+      <div class="progress" id="progress"></div>
+      <div id="game"></div>
+    </div>
+
+    <script>
+      let level = 0;
+      let dadScore = 0;
+      let step = 0;
+
+      const game = document.getElementById("game");
+      const progress = document.getElementById("progress");
+      const scoreDisplay = document.getElementById("score");
+
+      // LEVEL 1 ITEMS
+      const level1Items = [
+        { emoji: "❤️", answer: "love" },
+        { emoji: "🍫", answer: "candy" },
+        { emoji: "💍", answer: "solitaire" },
+        { emoji: "💐", answer: "bouquet" },
+        { emoji: "🧸", answer: "teddy" },
+      ];
+
+      // LEVEL 2 CRAVINGS WITH GIFTS
+      const cravingQuestions = [
+        { real: "Ice cream", fake: "Pizza", gift: "Check the fridge" },
+        { real: "Pickles", fake: "Ketchup", gift: "Look near the pantry" },
+        {
+          real: "Cheesecake",
+          fake: "Donuts",
+          gift: "Check the study table",
+        },
+        {
+          real: "French fries",
+          fake: "Peanut butter",
+          gift: "Look by the kitchen counter",
+        },
+        {
+          real: "Strawberries",
+          fake: "Mango",
+          gift: "Check the dressing table",
+        },
+      ];
+
+      function updateScore() {
+        scoreDisplay.innerText = `Dad Score: ${dadScore} 👑`;
+      }
+
+      function dadGrade(score) {
+        if (score >= 220) return "Legendary Dad 🏆";
+        if (score >= 150) return "Elite Dad 🌟";
+        return "Good Dad 💙";
+      }
+
+      function nextLevel() {
+        level++;
+        loadLevel();
+      }
+
+      // SHOW LEVELS
+      function loadLevel() {
+        game.innerHTML = "";
+        step = 0;
+        progress.innerText =
+          level === 0 ? "💘 Valentine Mode 💘" : `Level ${level} of 5 💕`;
+
+        /* LEVEL 0 */
+        if (level === 0) {
+          game.innerHTML = `
+      <h2>Hello Toniiiiiiiii 💖</h2>
+      <p>This Valentine’s Day is extra special…<br>
+      because we’re already a team of three 👶</p>
+      <p>Play each level to gain Dad score and your ultimate Dad status.</p>
+      <button onclick="nextLevel()">Start 💘</button>
+    `;
+        }
+
+        /* LEVEL 1 */
+        if (level === 1) showLevel1();
+
+        /* LEVEL 2 */
+        if (level === 2) showCraving();
+
+        /* LEVEL 3 – MOVING HEARTS */
+        if (level === 3) {
+          game.innerHTML = `
+      <h2>🛡 Protect the Baby Bump</h2>
+      <p>Catch 8 moving hearts ❤️</p>
+      <p id="counter">0 / 8</p>
+    `;
+          let count = 0;
+          for (let i = 0; i < 8; i++) {
+            const heart = document.createElement("span");
+            heart.className = "item moving-heart";
+            heart.innerText = "❤️";
+            heart.style.left = Math.random() * 80 + "%";
+            heart.style.top = Math.random() * 200 + "px";
+            heart.onclick = () => {
+              heart.remove();
+              count++;
+              dadScore += 5;
+              updateScore();
+              document.getElementById("counter").innerText = `${count} / 8`;
+              if (count === 8) showGift("The fridge");
+            };
+            game.appendChild(heart);
+          }
+        }
+
+        /* LEVEL 4 – NEXT BUTTON ONLY */
+        if (level === 4) {
+          game.innerHTML = `
+      <h2>🧠 Dad Skills Training</h2>
+      <p>Click all the love notes 💌</p>
+      <div id="notes"></div>
+      <div id="nextBtn"></div>
+    `;
+          const notes = [
+            "I’ve got you ❤️",
+            "We’re a team",
+            "Rest, I’ll handle it",
+            "I love you both",
+            "You’re never alone 💕",
+          ];
+
+          notes.forEach((n) => {
+            const btn = document.createElement("button");
+            btn.innerText = "💌";
+            btn.onclick = () => {
+              btn.innerText = n;
+              btn.disabled = true;
+              dadScore += 5;
+              updateScore();
+              if (
+                [...document.querySelectorAll("#notes button")].every(
+                  (b) => b.disabled
+                )
+              ) {
+                document.getElementById(
+                  "nextBtn"
+                ).innerHTML = `<p>Collect your gift from the bookshelf 🎁</p>
+             <button onclick="nextLevel()">Next ➡️</button>`;
+              }
+            };
+            document.getElementById("notes").appendChild(btn);
+          });
+        }
+
+        /* LEVEL 5 – DAD REFLEX CHALLENGE */
+        if (level === 5) {
+          game.innerHTML = `
+      <h2>🎯 Dad Reflex Challenge</h2>
+      <p>Catch the baby 👶 5 times!</p>
+      <div id="baby" class="item">👶</div>
+      <p id="hits">0 / 5</p>
+    `;
+          let hits = 0;
+          const baby = document.getElementById("baby");
+          baby.onclick = () => {
+            hits++;
+            dadScore += 10;
+            updateScore();
+            document.getElementById("hits").innerText = `${hits} / 5`;
+            baby.style.marginLeft = Math.random() * 200 - 100 + "px";
+            baby.style.marginTop = Math.random() * 120 - 60 + "px";
+            if (hits === 5) showFinal();
+          };
+        }
+      }
+
+      /* SHOW LEVEL 1 */
+      function showLevel1() {
+        const item = level1Items[step];
+        game.innerHTML = `
+    <h2>💖 Name That Valentine Item</h2>
+    <div class="item">${item.emoji}</div>
+    <input id="answer" placeholder="Guess the name..." />
+    <br>
+    <button onclick="checkLevel1()">Submit</button>
+    <p class="small">${step + 1} of ${level1Items.length}</p>
+  `;
+      }
+
+      function checkLevel1() {
+        const input = document.getElementById("answer").value.toLowerCase();
+        if (input.includes(level1Items[step].answer)) {
+          dadScore += 10;
+          updateScore();
+          step++;
+          if (step < level1Items.length) showLevel1();
+          else showGift("Check the dining table");
+        } else alert("Close… try again 😄");
+      }
+
+      /* SHOW LEVEL 2 CRAVINGS WITH RANDOM BUTTON ORDER */
+      function showCraving() {
+        const q = cravingQuestions[step];
+
+        // Randomize button order
+        let buttons = [
+          { text: q.real, correct: true },
+          { text: q.fake, correct: false },
+        ];
+        if (Math.random() > 0.5) buttons.reverse();
+
+        game.innerHTML = `
+    <h2>🍓 Cravings Quest</h2>
+    <button id="btn1">${buttons[0].text}</button>
+    <button id="btn2">${buttons[1].text}</button>
+    <p class="small">${step + 1} of ${cravingQuestions.length}</p>
+  `;
+
+        document.getElementById("btn1").onclick = () =>
+          handleCraving(buttons[0].correct, q.gift);
+        document.getElementById("btn2").onclick = () =>
+          handleCraving(buttons[1].correct, q.gift);
+      }
+
+      function handleCraving(isCorrect, giftMessage) {
+        if (isCorrect) {
+          dadScore += 10;
+          updateScore();
+          step++;
+          if (step < cravingQuestions.length) showCraving();
+          else showGift(giftMessage);
+        } else alert("Nope 😄 Try again");
+      }
+
+      /* SHOW GIFT MESSAGE AFTER LEVEL */
+      function showGift(location) {
+        game.innerHTML = `
+    <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
+    <button onclick="nextLevel()">Next ➡️</button>
+  `;
+      }
+
+      /* FINAL SCREEN + CONFETTI */
+      function showFinal() {
+        game.innerHTML = `
+    <h2>💝 Happy Valentine’s Day</h2>
+    <p>
+      Final Dad Score: <strong>${dadScore}</strong> 👑<br>
+      <strong>${dadGrade(dadScore)}</strong><br><br>
+      Watching you become a dad is already
+      the most beautiful thing in the world.<br><br>
+      We love you so much 💖👶
+      <br />
+      <p>🎁 Congrats! Collect your final reward from: <strong>The study table</strong></p>
+    </p>
+  `;
+        for (let i = 0; i < 30; i++) {
+          const c = document.createElement("div");
+          c.className = "confetti";
+          c.innerText = Math.random() > 0.5 ? "💖" : "✨";
+          c.style.left = Math.random() * 100 + "vw";
+          c.style.animationDelay = Math.random() * 3 + "s";
+          document.body.appendChild(c);
+        }
+      }
+
+      updateScore();
+      loadLevel();
+    </script>
+  </body>
+</html>
