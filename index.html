@@ -1,11 +1,14 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Dad Mode: Leveling Up</title>
 
-    <!-- Mobile viewport -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Mobile support -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
 
     <style>
       * {
@@ -31,6 +34,7 @@
         width: 100%;
         max-width: 520px;
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        text-align: center;
       }
 
       h2 {
@@ -47,7 +51,7 @@
       button,
       input {
         width: 100%;
-        max-width: 300px;
+        max-width: 320px;
         padding: 14px 18px;
         border-radius: 999px;
         border: none;
@@ -86,7 +90,7 @@
         touch-action: manipulation;
       }
 
-      /* Moving hearts container */
+      /* Moving hearts area */
       .heart-area {
         position: relative;
         width: 100%;
@@ -97,18 +101,18 @@
 
       .moving-heart {
         position: absolute;
-        animation: float 3.5s ease-in-out infinite;
+        animation: drift 3s linear infinite alternate;
       }
 
-      @keyframes float {
+      @keyframes drift {
         0% {
-          transform: translateY(0);
+          transform: translate(0, 0);
         }
         50% {
-          transform: translateY(-35px);
+          transform: translate(30px, -30px);
         }
         100% {
-          transform: translateY(0);
+          transform: translate(-30px, 30px);
         }
       }
 
@@ -161,9 +165,13 @@
 
       const cravingQuestions = [
         { real: "Ice cream", fake: "Pizza", gift: "Check the fridge" },
-        { real: "Pickles", fake: "Ketchup", gift: "Look near the pantry" },
-        { real: "Cheesecake", fake: "Donuts", gift: "Check the study table" },
-        { real: "French fries", fake: "Peanut butter", gift: "Kitchen counter" },
+        { real: "Pickles", fake: "Ketchup", gift: "Near the pantry" },
+        { real: "Cheesecake", fake: "Donuts", gift: "Study table" },
+        {
+          real: "French fries",
+          fake: "Peanut butter",
+          gift: "Kitchen counter",
+        },
         { real: "Strawberries", fake: "Mango", gift: "Dressing table" },
       ];
 
@@ -190,10 +198,10 @@
 
         if (level === 0) {
           game.innerHTML = `
-            <h2>Hello Toniiiiiiiii 💖</h2>
-            <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
-            <button onclick="nextLevel()">Start 💘</button>
-          `;
+      <h2>Hello Toniiiiiiiii 💖</h2>
+      <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
+      <button onclick="nextLevel()">Start 💘</button>
+    `;
         }
 
         if (level === 1) showLevel1();
@@ -203,23 +211,97 @@
         if (level === 5) showReflex();
       }
 
+      /* LEVEL 1 */
+      function showLevel1() {
+        const item = level1Items[step];
+        game.innerHTML = `
+    <h2>💖 Name That Valentine Item</h2>
+    <div class="item">${item.emoji}</div>
+    <input id="answer" placeholder="Guess the name..." />
+    <button onclick="checkLevel1()">Submit</button>
+    <p class="small">${step + 1} of ${level1Items.length}</p>
+  `;
+      }
+
+      function checkLevel1() {
+        const input = document.getElementById("answer").value.toLowerCase();
+        if (input.includes(level1Items[step].answer)) {
+          dadScore += 10;
+          updateScore();
+          step++;
+          step < level1Items.length ? showLevel1() : showGift("Dining table");
+        } else alert("Close… try again 😄");
+      }
+
+      /* LEVEL 2 */
+      function showCraving() {
+        const q = cravingQuestions[step];
+        let buttons = [
+          { text: q.real, correct: true },
+          { text: q.fake, correct: false },
+        ];
+        if (Math.random() > 0.5) buttons.reverse();
+
+        game.innerHTML = `
+    <h2>🍓 Cravings Quest</h2>
+    <p>Choose the right carvings from the options</p>
+    <button onclick="handleCraving(${buttons[0].correct}, '${q.gift}')">${buttons[0].text}</button>
+    <button onclick="handleCraving(${buttons[1].correct}, '${q.gift}')">${buttons[1].text}</button>
+    <p class="small">${step + 1} of ${cravingQuestions.length}</p>
+  `;
+      }
+
+      function handleCraving(correct, gift) {
+        if (correct) {
+          dadScore += 10;
+          updateScore();
+          step++;
+          step < cravingQuestions.length ? showCraving() : showGift(gift);
+        } else alert("Nope 😄 Try again");
+      }
+
+      /* LEVEL 3 */
       function showMovingHearts() {
         game.innerHTML = `
-          <h2>🛡 Protect the Baby Bump</h2>
-          <p>Catch 10 moving hearts ❤️</p>
-          <p id="counter">0 / 10</p>
-          <div class="heart-area" id="heartArea"></div>
-        `;
+    <h2>🛡 Protect the Baby Bump</h2>
+    <p>Catch 10 moving hearts ❤️</p>
+    <p id="counter">0 / 10</p>
+    <div class="heart-area" id="heartArea"></div>
+  `;
+
         let count = 0;
         const area = document.getElementById("heartArea");
+        const areaWidth = area.clientWidth;
+        const areaHeight = area.clientHeight;
 
         for (let i = 0; i < 10; i++) {
           const heart = document.createElement("span");
           heart.className = "item moving-heart";
           heart.innerText = "❤️";
-          heart.style.left = Math.random() * 80 + "%";
-          heart.style.top = Math.random() * 140 + "px";
+
+          let x = Math.random() * (areaWidth - 40);
+          let y = Math.random() * (areaHeight - 40);
+
+          heart.style.left = x + "px";
+          heart.style.top = y + "px";
+
+          // Random floating movement
+          const moveHeart = () => {
+            x += (Math.random() - 0.5) * 80;
+            y += (Math.random() - 0.5) * 80;
+
+            // Keep inside area
+            x = Math.max(0, Math.min(areaWidth - 40, x));
+            y = Math.max(0, Math.min(areaHeight - 40, y));
+
+            heart.style.left = x + "px";
+            heart.style.top = y + "px";
+          };
+
+          const interval = setInterval(moveHeart, 800 + Math.random() * 700);
+
           heart.onclick = () => {
+            clearInterval(interval);
             heart.remove();
             count++;
             dadScore += 5;
@@ -227,20 +309,87 @@
             document.getElementById("counter").innerText = `${count} / 10`;
             if (count === 10) showGift("The fridge");
           };
+
           area.appendChild(heart);
         }
       }
+      /* LEVEL 4 */
+      function showNotes() {
+        game.innerHTML = `
+    <h2>🧠 Dad Skills Training</h2>
+    <p>Click all the love notes 💌</p>
+    <div id="notes"></div>
+    <div id="nextBtn"></div>
+  `;
+        const notes = [
+          "I’ve got you ❤️",
+          "We’re a team",
+          "Rest, I’ll handle it",
+          "I love you both",
+          "You’re never alone 💕",
+        ];
 
+        notes.forEach((n) => {
+          const btn = document.createElement("button");
+          btn.innerText = "💌";
+          btn.onclick = () => {
+            btn.innerText = n;
+            btn.disabled = true;
+            dadScore += 10;
+            updateScore();
+            if (
+              [...document.querySelectorAll("#notes button")].every(
+                (b) => b.disabled,
+              )
+            ) {
+              document.getElementById("nextBtn").innerHTML =
+                `<p>🎁 Collect your gift from the bookshelf</p>
+           <button onclick="nextLevel()">Next ➡️</button>`;
+            }
+          };
+          document.getElementById("notes").appendChild(btn);
+        });
+      }
+
+      /* LEVEL 5 */
+      function showReflex() {
+        game.innerHTML = `
+    <h2>🎯 Dad Reflex Challenge</h2>
+    <p>Catch the baby 👶 5 times!</p>
+    <div id="baby" class="item">👶</div>
+    <p id="hits">0 / 5</p>
+  `;
+        let hits = 0;
+        const baby = document.getElementById("baby");
+        baby.onclick = () => {
+          hits++;
+          dadScore += 10;
+          updateScore();
+          document.getElementById("hits").innerText = `${hits} / 5`;
+          baby.style.transform = `translate(${Math.random() * 120 - 60}px, ${Math.random() * 80 - 40}px)`;
+          if (hits === 5) showFinal();
+        };
+      }
+
+      /* GIFT SCREEN */
+      function showGift(location) {
+        game.innerHTML = `
+    <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
+    <button onclick="nextLevel()">Next ➡️</button>
+  `;
+      }
+
+      /* FINAL */
       function showFinal() {
         game.innerHTML = `
-          <h2>💝 Happy Valentine’s Day</h2>
-          <p>
-            Final Dad Score: <strong>${dadScore}</strong> 👑<br>
-            <strong>${dadGrade(dadScore)}</strong><br><br>
-            We love you so much 💖👶
-          </p>
-          <p>🎁 Final gift: <strong>The study table</strong></p>
-        `;
+    <h2>💝 Happy Valentine’s Day</h2>
+    <p>
+      Final Dad Score: <strong>${dadScore}</strong> 👑<br>
+      <strong>${dadGrade(dadScore)}</strong><br><br>
+      We love you so much 💖👶
+    </p>
+    <p>🎁 Final gift: <strong>The study table</strong></p>
+  `;
         for (let i = 0; i < 25; i++) {
           const c = document.createElement("div");
           c.className = "confetti";
@@ -250,8 +399,6 @@
           document.body.appendChild(c);
         }
       }
-
-      /* Other logic unchanged (Level 1, 2, 4, 5 functions remain same) */
 
       updateScore();
       loadLevel();
