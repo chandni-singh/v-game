@@ -116,6 +116,57 @@
         }
       }
 
+      #mood {
+        width: 100%;
+        height: 10px;
+        background: #ffe4e1;
+        border-radius: 10px;
+        margin: 8px 0;
+        overflow: hidden;
+      }
+
+      #mood-bar {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #ffb6c1, #ff4f7b);
+        transition: width 0.4s ease;
+      }
+
+      #mood-label {
+        font-size: 13px;
+        font-weight: bold;
+        color: #ff4f7b;
+      }
+
+      .envelope {
+        font-size: 42px;
+        cursor: pointer;
+        margin-top: 20px;
+        animation: bounce 1.6s infinite;
+        pointer-events: auto;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-8px);
+        }
+      }
+
+      .secret-message {
+        display: none;
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff0f5;
+        border-radius: 16px;
+        color: #ff2f66;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+
       /* Confetti */
       .confetti {
         position: fixed;
@@ -136,12 +187,107 @@
         font-size: 13px;
         color: #777;
       }
+
+      .letter-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 182, 193, 0.95);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+      }
+
+      .letter-card {
+        background: #fff;
+        border-radius: 20px;
+        padding: 24px;
+        max-width: 90%;
+        max-height: 80vh;
+        overflow-y: auto;
+        color: #ff2f66;
+        text-align: left;
+        line-height: 1.6;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        animation: fadeInUp 0.4s ease;
+      }
+
+      .close-letter {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 14px;
+        color: #999;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      #baby {
+        position: absolute;
+        font-size: 44px;
+        cursor: pointer;
+        user-select: none;
+        transition: none;
+      }
+
+      .heart-pulse {
+        font-size: 64px;
+        margin: 20px 0 10px;
+        animation: heartbeat 1.3s infinite;
+      }
+
+      @keyframes heartbeat {
+        0% {
+          transform: scale(1);
+        }
+        30% {
+          transform: scale(1.25);
+        }
+        50% {
+          transform: scale(1);
+        }
+        70% {
+          transform: scale(1.25);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .tap-hint {
+        font-size: 14px;
+        color: #ff4f7b;
+        animation: fade 1.3s infinite;
+      }
+
+      @keyframes fade {
+        0%,
+        100% {
+          opacity: 0.5;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
     </style>
   </head>
 
   <body>
     <div class="game-box">
       <div class="score" id="score">Dad Score: 0 👑</div>
+      <div id="mood">
+        <div id="mood-bar"></div>
+      </div>
+      <div id="mood-label">Good Dad 😌</div>
+      <br />
       <div class="progress" id="progress"></div>
       <div id="game"></div>
     </div>
@@ -156,7 +302,7 @@
       const scoreDisplay = document.getElementById("score");
 
       const level1Items = [
-        { emoji: "❤️", answer: "love" },
+        { emoji: "🫶🏻", answer: "love" },
         { emoji: "🍫", answer: "candy" },
         { emoji: "💍", answer: "solitaire" },
         { emoji: "💐", answer: "bouquet" },
@@ -177,6 +323,16 @@
 
       function updateScore() {
         scoreDisplay.innerText = `Dad Score: ${dadScore} 👑`;
+
+        const bar = document.getElementById("mood-bar");
+        const label = document.getElementById("mood-label");
+
+        let percent = Math.min((dadScore / 220) * 100, 100);
+        bar.style.width = percent + "%";
+
+        if (dadScore >= 220) label.innerText = "Legendary Dad 🦸‍♂️";
+        else if (dadScore >= 150) label.innerText = "Elite Dad 💪";
+        else label.innerText = "Good Dad 😌";
       }
 
       function dadGrade(score) {
@@ -198,10 +354,11 @@
 
         if (level === 0) {
           game.innerHTML = `
-      <h2>Hello Toniiiiiiiii 💖</h2>
-      <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
-      <button onclick="nextLevel()">Start 💘</button>
-    `;
+                            <h2>Hello Toniiiiiiiii 💖</h2>
+                            <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
+                            <div class="heart-pulse">❤️</div>
+                            <button onclick="nextLevel()">Tap to Continue 💘</button>
+                          `;
         }
 
         if (level === 1) showLevel1();
@@ -211,16 +368,38 @@
         if (level === 5) showReflex();
       }
 
+      function openEnvelope() {
+        function openEnvelope() {
+          const letter = document.getElementById("secretLetter");
+          letter.style.display = "block";
+          showPopHearts(10);
+        }
+      }
+
+      function showPopHearts(count = 5) {
+        for (let i = 0; i < count; i++) {
+          const heart = document.createElement("div");
+          heart.className = "pop-heart";
+          heart.innerText = "❤️";
+          heart.style.left = Math.random() * 100 + "vw";
+          heart.style.top = Math.random() * 100 + "vh";
+          document.body.appendChild(heart);
+          setTimeout(() => heart.remove(), 1000);
+        }
+      }
+
       /* LEVEL 1 */
       function showLevel1() {
         const item = level1Items[step];
         game.innerHTML = `
-    <h2>💖 Name That Valentine Item</h2>
-    <div class="item">${item.emoji}</div>
-    <input id="answer" placeholder="Guess the name..." />
-    <button onclick="checkLevel1()">Submit</button>
-    <p class="small">${step + 1} of ${level1Items.length}</p>
-  `;
+                          <h2>💖 Name That Valentine Item</h2>
+                          <p>Type the name of this item based on the emoji 🤔</p>
+                          <br />
+                          <div class="item">${item.emoji}</div>
+                          <input id="answer" placeholder="Guess the name..." />
+                          <button onclick="checkLevel1()">Submit</button>
+                          <p class="small">${step + 1} of ${level1Items.length}</p>
+                        `;
       }
 
       function checkLevel1() {
@@ -243,12 +422,12 @@
         if (Math.random() > 0.5) buttons.reverse();
 
         game.innerHTML = `
-    <h2>🍓 Cravings Quest</h2>
-    <p>Choose the right carvings from the options</p>
-    <button onclick="handleCraving(${buttons[0].correct}, '${q.gift}')">${buttons[0].text}</button>
-    <button onclick="handleCraving(${buttons[1].correct}, '${q.gift}')">${buttons[1].text}</button>
-    <p class="small">${step + 1} of ${cravingQuestions.length}</p>
-  `;
+                          <h2>🍓 Cravings Quest</h2>
+                          <p>Choose my current carvings from the options 😋</p>
+                          <button onclick="handleCraving(${buttons[0].correct}, '${q.gift}')">${buttons[0].text}</button>
+                          <button onclick="handleCraving(${buttons[1].correct}, '${q.gift}')">${buttons[1].text}</button>
+                          <p class="small">${step + 1} of ${cravingQuestions.length}</p>
+                        `;
       }
 
       function handleCraving(correct, gift) {
@@ -257,17 +436,19 @@
           updateScore();
           step++;
           step < cravingQuestions.length ? showCraving() : showGift(gift);
-        } else alert("Nope 😄 Try again");
+        } else {
+          alert("Nope 😄 Try again");
+        }
       }
 
       /* LEVEL 3 */
       function showMovingHearts() {
         game.innerHTML = `
-    <h2>🛡 Protect the Baby Bump</h2>
-    <p>Catch 10 moving hearts ❤️</p>
-    <p id="counter">0 / 10</p>
-    <div class="heart-area" id="heartArea"></div>
-  `;
+                          <h2>🛡 Guardian of the Bump</h2>
+                          <p>Pop 10 moving hearts ❤️</p>
+                          <p id="counter">0 / 10</p>
+                          <div class="heart-area" id="heartArea"></div>
+                        `;
 
         let count = 0;
         const area = document.getElementById("heartArea");
@@ -316,11 +497,11 @@
       /* LEVEL 4 */
       function showNotes() {
         game.innerHTML = `
-    <h2>🧠 Dad Skills Training</h2>
-    <p>Click all the love notes 💌</p>
-    <div id="notes"></div>
-    <div id="nextBtn"></div>
-  `;
+                          <h2>🧠 Dad Skills Training</h2>
+                          <p>Click all the love notes 💌</p>
+                          <div id="notes"></div>
+                          <div id="nextBtn"></div>
+                        `;
         const notes = [
           "I’ve got you ❤️",
           "We’re a team",
@@ -344,7 +525,7 @@
             ) {
               document.getElementById("nextBtn").innerHTML =
                 `<p>🎁 Collect your gift from the bookshelf</p>
-           <button onclick="nextLevel()">Next ➡️</button>`;
+                                 <button onclick="nextLevel()">Next ➡️</button>`;
             }
           };
           document.getElementById("notes").appendChild(btn);
@@ -353,43 +534,130 @@
 
       /* LEVEL 5 */
       function showReflex() {
+        /* LEVEL 5 – DAD REFLEX CHALLENGE (Teleport + Speed Up) */
         game.innerHTML = `
-    <h2>🎯 Dad Reflex Challenge</h2>
-    <p>Catch the baby 👶 5 times!</p>
-    <div id="baby" class="item">👶</div>
-    <p id="hits">0 / 5</p>
-  `;
+        <h2>🎯 Dad Reflex Challenge</h2>
+        <p>Catch the baby 👶 5 times!</p>
+        <div id="playArea" style="position:relative; height:260px;">
+          <div id="baby">👶</div>
+        </div>
+        <p id="hits">0 / 5</p>
+        <p class="small">👶 He’s getting quicker…</p>
+      `;
+
         let hits = 0;
+        let delay = 2000; // starting speed (ms)
         const baby = document.getElementById("baby");
+        const area = document.getElementById("playArea");
+
+        function teleportBaby() {
+          const maxX = area.clientWidth - 50;
+          const maxY = area.clientHeight - 50;
+
+          const x = Math.random() * maxX;
+          const y = Math.random() * maxY;
+
+          baby.style.left = x + "px";
+          baby.style.top = y + "px";
+        }
+
+        teleportBaby();
+
         baby.onclick = () => {
+          // baby sound (safe)
+          const sound = document.getElementById("babySound");
+          sound.currentTime = 0;
+          sound.play().catch(() => {});
+
           hits++;
           dadScore += 10;
           updateScore();
+
           document.getElementById("hits").innerText = `${hits} / 5`;
-          baby.style.transform = `translate(${Math.random() * 120 - 60}px, ${Math.random() * 80 - 40}px)`;
-          if (hits === 5) showFinal();
+
+          delay = Math.max(250, delay - 120); // speed up
+          teleportBaby();
+
+          if (hits === 5) {
+            setTimeout(showFinal, 300);
+          }
         };
+
+        // auto-teleport if player is slow
+        const moveLoop = setInterval(() => {
+          teleportBaby();
+          if (hits >= 5) clearInterval(moveLoop);
+        }, delay);
       }
 
       /* GIFT SCREEN */
       function showGift(location) {
         game.innerHTML = `
-    <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
-    <button onclick="nextLevel()">Next ➡️</button>
-  `;
+                          <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
+                          <button onclick="nextLevel()">Next ➡️</button>
+                        `;
       }
 
       /* FINAL */
       function showFinal() {
         game.innerHTML = `
-    <h2>💝 Happy Valentine’s Day</h2>
-    <p>
-      Final Dad Score: <strong>${dadScore}</strong> 👑<br>
-      <strong>${dadGrade(dadScore)}</strong><br><br>
-      We love you so much 💖👶
-    </p>
-    <p>🎁 Final gift: <strong>The study table</strong></p>
-  `;
+                          <h2>💝 Happy Valentine’s Day</h2>
+                          <p>
+                            Final Dad Score: <strong>${dadScore}</strong> 👑<br>
+                            <strong>${dadGrade(dadScore)}</strong><br><br>
+                            We love you so much 💖👶
+                          </p>
+                          <p>🎁 Final gift: <strong>The study table</strong></p>
+
+                          <p class="small">A letter just for you 💌</p>
+
+
+                        <div class="envelope" id="envelope">✉️</div>
+
+                        <div id="letterOverlay" class="letter-overlay">
+                        <div class="letter-card">
+                            <h3>My Toni,</h3>
+
+                            <p>
+                            From the moment we found out about this tiny heartbeat,
+                            I saw a new strength in you — calm, steady, and full of love that already protects us.
+                            </p>
+
+                            <p>
+                            You make this journey feel safe.
+                            You listen, you plan, you care in ways that matter.
+                            Our baby is already so lucky to have you.
+                            </p>
+
+                            <p>
+                            Thank you for being my partner, my comfort,
+                            and the man I trust with our whole world.
+                            </p>
+
+                            <p>
+                            We choose you — every day, in every way. 💖👶
+                            </p>
+
+                            <p><strong>Happy Valentine’s Day.</strong></p>
+
+                            <div class="close-letter">(Tap anywhere to close)</div>
+                        </div>
+                    </div>
+                        `;
+
+        const envelope = document.getElementById("envelope");
+        const overlay = document.getElementById("letterOverlay");
+
+        envelope.addEventListener("click", () => {
+          document.body.style.overflow = "hidden";
+          overlay.style.display = "flex";
+        });
+
+        overlay.addEventListener("click", () => {
+          document.body.style.overflow = "auto";
+          overlay.style.display = "none";
+        });
+
         for (let i = 0; i < 25; i++) {
           const c = document.createElement("div");
           c.className = "confetti";
