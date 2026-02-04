@@ -524,7 +524,7 @@
               )
             ) {
               document.getElementById("nextBtn").innerHTML =
-                `<p>🎁 Collect your gift from the bookshelf</p>
+                `<p>🎁 Congrats! Collect your reward from: <b>the Bookshelf</b></p>
                                  <button onclick="nextLevel()">Next ➡️</button>`;
             }
           };
@@ -564,11 +564,6 @@
         teleportBaby();
 
         baby.onclick = () => {
-          // baby sound (safe)
-          const sound = document.getElementById("babySound");
-          sound.currentTime = 0;
-          sound.play().catch(() => {});
-
           hits++;
           dadScore += 10;
           updateScore();
@@ -579,7 +574,7 @@
           teleportBaby();
 
           if (hits === 5) {
-            setTimeout(showFinal, 300);
+            setTimeout(showFinal, 500);
           }
         };
 
@@ -607,7 +602,7 @@
                             <strong>${dadGrade(dadScore)}</strong><br><br>
                             We love you so much 💖👶
                           </p>
-                          <p>🎁 Final gift: <strong>The study table</strong></p>
+                          <p>🎁 Congrats! Collect Final reward from: <strong>The Study table</strong></p>
 
                           <p class="small">A letter just for you 💌</p>
 
