@@ -9,6 +9,10 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
       * {
@@ -220,6 +224,17 @@
         z-index: 999;
       }
 
+      @keyframes letterOpen {
+        from {
+          transform: scale(0.8);
+          opacity: 0;
+        }
+        to {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
       .letter-card {
         background: #fff;
         border-radius: 20px;
@@ -231,7 +246,10 @@
         text-align: left;
         line-height: 1.6;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-        animation: fadeInUp 0.4s ease;
+        animation: letterOpen 0.5s ease;
+        font-family:
+          Dancing Script,
+          cursive;
       }
 
       .close-letter {
@@ -400,6 +418,40 @@
         transform: rotateY(180deg);
         font-size: 14px;
       }
+
+      /* iOS haptic fallback */
+      @keyframes iosShake {
+        0% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-2px);
+        }
+        50% {
+          transform: translateX(2px);
+        }
+        75% {
+          transform: translateX(-1px);
+        }
+        100% {
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes pulseGlow {
+        0% {
+          box-shadow: 0 0 0 rgba(255, 79, 123, 0.4);
+        }
+        100% {
+          box-shadow: 0 0 12px rgba(255, 79, 123, 0);
+        }
+      }
+
+      .ios-haptic {
+        animation:
+          iosShake 0.18s ease-in-out,
+          pulseGlow 0.25s ease-out;
+      }
     </style>
   </head>
 
@@ -443,6 +495,23 @@
         },
         { real: "Strawberries", fake: "Mango", gift: "Dressing table" },
       ];
+
+      function haptic(ms = 20, target = game) {
+        // Android & supported devices
+        if (navigator.vibrate) {
+          navigator.vibrate(ms);
+        } else {
+          // iOS fallback: visual micro-shake
+          iosHapticFallback(target);
+        }
+      }
+
+      function iosHapticFallback(el) {
+        if (!el) return;
+
+        el.classList.add("ios-haptic");
+        setTimeout(() => el.classList.remove("ios-haptic"), 180);
+      }
 
       function updateScore() {
         scoreDisplay.innerText = `Dad Score: ${dadScore} 👑`;
@@ -655,6 +724,7 @@
 
           // Click behavior
           heart.onclick = () => {
+            haptic(15, heart);
             heart.remove();
             count++;
             dadScore += 5;
@@ -708,7 +778,7 @@
 
           card.onclick = () => {
             if (card.classList.contains("flipped")) return;
-
+            haptic(30, card);
             card.classList.add("flipped");
             dadScore += 10;
             updateScore();
@@ -747,7 +817,7 @@
         `;
 
         let hits = 0;
-        let delay = 500; // starting speed (ms)
+        let delay = 600; // starting speed (ms)
         const baby = document.getElementById("baby");
         baby.classList.add("baby-wiggle");
         const area = document.getElementById("playArea");
@@ -766,6 +836,7 @@
         teleportBaby();
 
         baby.onclick = () => {
+          haptic(40, baby);
           hits++;
           dadScore += 10;
           updateScore();
@@ -849,6 +920,7 @@
         const overlay = document.getElementById("letterOverlay");
 
         envelope.addEventListener("click", () => {
+          haptic(50, envelope);
           document.body.style.overflow = "hidden";
           overlay.style.display = "flex";
         });
