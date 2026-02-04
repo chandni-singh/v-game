@@ -321,33 +321,28 @@
         }
       }
 
-      /* Wiggle animation */
-      @keyframes wiggle {
+      /* Continuous baby wiggle */
+      @keyframes babyWiggle {
         0% {
-          transform: rotate(0deg);
+          transform: rotate(0deg) scale(1);
         }
-        15% {
-          transform: rotate(3deg);
+        25% {
+          transform: rotate(3deg) scale(1.03);
         }
-        30% {
-          transform: rotate(-3deg);
-        }
-        45% {
-          transform: rotate(2deg);
-        }
-        60% {
-          transform: rotate(-2deg);
+        50% {
+          transform: rotate(0deg) scale(1);
         }
         75% {
-          transform: rotate(1deg);
+          transform: rotate(-3deg) scale(1.03);
         }
         100% {
-          transform: rotate(0deg);
+          transform: rotate(0deg) scale(1);
         }
       }
 
-      .wiggle {
-        animation: wiggle 0.5s ease-in-out;
+      .baby-wiggle {
+        animation: babyWiggle 1.2s ease-in-out infinite;
+        transform-origin: center;
       }
 
       /* Flip card container */
@@ -752,8 +747,9 @@
         `;
 
         let hits = 0;
-        let delay = 750; // starting speed (ms)
+        let delay = 500; // starting speed (ms)
         const baby = document.getElementById("baby");
+        baby.classList.add("baby-wiggle");
         const area = document.getElementById("playArea");
 
         function teleportBaby() {
@@ -779,10 +775,6 @@
           // Teleport to new position
           baby.style.left = Math.random() * 80 + "%";
           baby.style.top = Math.random() * 60 + "%";
-
-          // Wiggle on teleport
-          baby.classList.add("wiggle");
-          setTimeout(() => baby.classList.remove("wiggle"), 1000);
 
           if (hits === 5) {
             showFireworksInGameArea();
