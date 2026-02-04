@@ -535,7 +535,7 @@
       function showLevel1() {
         const item = level1Items[step];
         game.innerHTML = `
-            <h2>💖 Name That Valentine Item</h2>
+            <h2>💖 Name That Valentine Element</h2>
             <p>Type the name of this item based on the emoji 🤔</p>
             <div class="item">${item.emoji}</div>
             <input id="answer" placeholder="Guess the name..." />
@@ -747,7 +747,7 @@
         `;
 
         let hits = 0;
-        let delay = 650; // starting speed (ms)
+        let delay = 600; // starting speed (ms)
         const baby = document.getElementById("baby");
         baby.classList.add("baby-wiggle");
         const area = document.getElementById("playArea");
