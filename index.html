@@ -488,7 +488,7 @@
             dadScore += 5;
             updateScore();
             document.getElementById("counter").innerText = `${count} / 10`;
-            if (count === 10) showGift("The fridge");
+            if (count === 10) showGift("Refrigerator");
           };
 
           area.appendChild(heart);
@@ -524,7 +524,7 @@
               )
             ) {
               document.getElementById("nextBtn").innerHTML =
-                `<p>🎁 Congrats! Collect your reward from: <b>the Bookshelf</b></p>
+                `<p>🎁 Congrats! Collect your reward from: <b>Bookshelf</b></p>
                                  <button onclick="nextLevel()">Next ➡️</button>`;
             }
           };
@@ -546,7 +546,7 @@
       `;
 
         let hits = 0;
-        let delay = 2000; // starting speed (ms)
+        let delay = 750; // starting speed (ms)
         const baby = document.getElementById("baby");
         const area = document.getElementById("playArea");
 
@@ -570,7 +570,7 @@
 
           document.getElementById("hits").innerText = `${hits} / 5`;
 
-          delay = Math.max(250, delay - 120); // speed up
+          delay = Math.max(180, delay - 180); // speed up
           teleportBaby();
 
           if (hits === 5) {
@@ -599,10 +599,11 @@
                           <h2>💝 Happy Valentine’s Day</h2>
                           <p>
                             Final Dad Score: <strong>${dadScore}</strong> 👑<br>
-                            <strong>${dadGrade(dadScore)}</strong><br><br>
+                            <strong>${dadGrade(dadScore)}</strong><br>
+                            <div class="heart-pulse">❤️</div>
                             We love you so much 💖👶
                           </p>
-                          <p>🎁 Congrats! Collect Final reward from: <strong>The Study table</strong></p>
+                          <p>🎁 Congrats! Collect Final reward from: <strong>Study table</strong></p>
 
                           <p class="small">A letter just for you 💌</p>
 
@@ -615,7 +616,7 @@
 
                             <p>
                             From the moment we found out about this tiny heartbeat,
-                            I saw a new strength in you — calm, steady, and full of love that already protects us.
+                            I saw a new strength in you — calm, steady and full of love that already protects us.
                             </p>
 
                             <p>
@@ -625,7 +626,7 @@
                             </p>
 
                             <p>
-                            Thank you for being my partner, my comfort,
+                            Thank you for being my partner, my comfort
                             and the man I trust with our whole world.
                             </p>
 
