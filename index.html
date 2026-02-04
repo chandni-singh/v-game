@@ -28,6 +28,7 @@
       }
 
       .game-box {
+        position: relative;
         background: white;
         padding: 20px;
         border-radius: 20px;
@@ -35,6 +36,7 @@
         max-width: 520px;
         box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
         text-align: center;
+        overflow: hidden;
       }
 
       h2 {
@@ -99,9 +101,29 @@
         overflow: hidden;
       }
 
+      @keyframes swirl {
+        0% {
+          transform: translate(0, 0) rotate(0deg);
+        }
+        25% {
+          transform: translate(20px, -30px) rotate(45deg);
+        }
+        50% {
+          transform: translate(-15px, -60px) rotate(90deg);
+        }
+        75% {
+          transform: translate(25px, -90px) rotate(135deg);
+        }
+        100% {
+          transform: translate(0, -120px) rotate(180deg);
+        }
+      }
+
       .moving-heart {
         position: absolute;
-        animation: drift 3s linear infinite alternate;
+        animation: swirl linear infinite;
+        font-size: 40px;
+        cursor: pointer;
       }
 
       @keyframes drift {
@@ -277,6 +299,112 @@
           opacity: 1;
         }
       }
+
+      .firework {
+        position: absolute;
+        font-size: 24px;
+        pointer-events: none;
+        animation: firework-fade 0.8s ease-out forwards;
+      }
+
+      @keyframes firework-fade {
+        0% {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+        50% {
+          transform: translateY(-20px) scale(1.2); /* slight float up and grow */
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(-40px) scale(1);
+        }
+      }
+
+      /* Wiggle animation */
+      @keyframes wiggle {
+        0% {
+          transform: rotate(0deg);
+        }
+        15% {
+          transform: rotate(3deg);
+        }
+        30% {
+          transform: rotate(-3deg);
+        }
+        45% {
+          transform: rotate(2deg);
+        }
+        60% {
+          transform: rotate(-2deg);
+        }
+        75% {
+          transform: rotate(1deg);
+        }
+        100% {
+          transform: rotate(0deg);
+        }
+      }
+
+      .wiggle {
+        animation: wiggle 0.5s ease-in-out;
+      }
+
+      /* Flip card container */
+      .flip-card {
+        width: 120px;
+        height: 80px;
+        perspective: 1000px;
+        display: inline-block;
+        margin: 8px;
+      }
+
+      /* Inner card */
+      .flip-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        transition: transform 0.6s ease;
+        transform-style: preserve-3d;
+        cursor: pointer;
+      }
+
+      /* When flipped */
+      .flip-card.flipped .flip-card-inner {
+        transform: rotateY(180deg);
+      }
+
+      /* Card faces */
+      .flip-card-front,
+      .flip-card-back {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        padding: 8px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+      }
+
+      /* Front */
+      .flip-card-front {
+        background: #ff4f7b;
+        color: white;
+        font-size: 28px;
+      }
+
+      /* Back */
+      .flip-card-back {
+        background: #fff;
+        color: #ff4f7b;
+        transform: rotateY(180deg);
+        font-size: 14px;
+      }
     </style>
   </head>
 
@@ -354,11 +482,12 @@
 
         if (level === 0) {
           game.innerHTML = `
-                            <h2>Hello Toniiiiiiiii 💖</h2>
-                            <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
-                            <div class="heart-pulse">❤️</div>
-                            <button onclick="nextLevel()">Tap to Continue 💘</button>
-                          `;
+            <h2>Hello Toniiiiiiiii 💖</h2>
+            <p>This Valentine’s Day is extra special…<br>because we’re already a team of three 👶</p>
+            <div class="heart-pulse">❤️</div>
+            <br />
+            <button onclick="nextLevel()">Tap to Continue 💘</button>
+        `;
         }
 
         if (level === 1) showLevel1();
@@ -388,18 +517,36 @@
         }
       }
 
+      function showFireworksInGameArea() {
+        const colors = ["✨"];
+        const rect = game.getBoundingClientRect();
+
+        for (let i = 0; i < 20; i++) {
+          const f = document.createElement("div");
+          f.className = "firework";
+          f.innerText = colors[Math.floor(Math.random() * colors.length)];
+
+          // Random position inside game area
+          f.style.left = Math.random() * (rect.width - 20) + "px";
+          f.style.bottom = Math.random() * (rect.height - 30) + "px";
+
+          game.appendChild(f);
+
+          setTimeout(() => f.remove(), 800);
+        }
+      }
+
       /* LEVEL 1 */
       function showLevel1() {
         const item = level1Items[step];
         game.innerHTML = `
-                          <h2>💖 Name That Valentine Item</h2>
-                          <p>Type the name of this item based on the emoji 🤔</p>
-                          <br />
-                          <div class="item">${item.emoji}</div>
-                          <input id="answer" placeholder="Guess the name..." />
-                          <button onclick="checkLevel1()">Submit</button>
-                          <p class="small">${step + 1} of ${level1Items.length}</p>
-                        `;
+            <h2>💖 Name That Valentine Item</h2>
+            <p>Type the name of this item based on the emoji 🤔</p>
+            <div class="item">${item.emoji}</div>
+            <input id="answer" placeholder="Guess the name..." />
+            <button onclick="checkLevel1()">Submit</button>
+            <p class="small">${step + 1} of ${level1Items.length}</p>
+            `;
       }
 
       function checkLevel1() {
@@ -407,8 +554,17 @@
         if (input.includes(level1Items[step].answer)) {
           dadScore += 10;
           updateScore();
+
+          // Fireworks anywhere in game area
+          showFireworksInGameArea();
+
           step++;
-          step < level1Items.length ? showLevel1() : showGift("Dining table");
+          if (step < level1Items.length) {
+            // Small delay so fireworks are visible before next step
+            setTimeout(showLevel1, 800);
+          } else {
+            setTimeout(() => showGift("Dining table"), 800);
+          }
         } else alert("Close… try again 😄");
       }
 
@@ -422,20 +578,28 @@
         if (Math.random() > 0.5) buttons.reverse();
 
         game.innerHTML = `
-                          <h2>🍓 Cravings Quest</h2>
-                          <p>Choose my current carvings from the options 😋</p>
-                          <button onclick="handleCraving(${buttons[0].correct}, '${q.gift}')">${buttons[0].text}</button>
-                          <button onclick="handleCraving(${buttons[1].correct}, '${q.gift}')">${buttons[1].text}</button>
-                          <p class="small">${step + 1} of ${cravingQuestions.length}</p>
-                        `;
+            <h2>🍓 Cravings Quest</h2>
+            <p>Choose my current carvings from the options 😋</p>
+            <button onclick="handleCraving(${buttons[0].correct}, '${q.gift}')">${buttons[0].text}</button>
+            <button onclick="handleCraving(${buttons[1].correct}, '${q.gift}')">${buttons[1].text}</button>
+            <p class="small">${step + 1} of ${cravingQuestions.length}</p>
+            `;
       }
 
       function handleCraving(correct, gift) {
         if (correct) {
           dadScore += 10;
           updateScore();
+
+          // Fireworks anywhere in game area
+          showFireworksInGameArea();
+
           step++;
-          step < cravingQuestions.length ? showCraving() : showGift(gift);
+          if (step < cravingQuestions.length) {
+            setTimeout(showCraving, 800);
+          } else {
+            setTimeout(() => showGift("Dressing Table"), 800);
+          }
         } else {
           alert("Nope 😄 Try again");
         }
@@ -444,11 +608,11 @@
       /* LEVEL 3 */
       function showMovingHearts() {
         game.innerHTML = `
-                          <h2>🛡 Guardian of the Bump</h2>
-                          <p>Pop 10 moving hearts ❤️</p>
-                          <p id="counter">0 / 10</p>
-                          <div class="heart-area" id="heartArea"></div>
-                        `;
+            <h2>🛡 Guardian of the Bump</h2>
+            <p>Pop the moving hearts ❣️</p>
+            <p id="counter">0 / 10</p>
+            <div class="heart-area" id="heartArea" style="position: relative; height: 300px;"></div>
+        `;
 
         let count = 0;
         const area = document.getElementById("heartArea");
@@ -458,50 +622,76 @@
         for (let i = 0; i < 10; i++) {
           const heart = document.createElement("span");
           heart.className = "item moving-heart";
-          heart.innerText = "❤️";
+          heart.innerText = "❣️";
+          heart.style.position = "absolute";
 
+          // Random initial position
           let x = Math.random() * (areaWidth - 40);
           let y = Math.random() * (areaHeight - 40);
-
           heart.style.left = x + "px";
           heart.style.top = y + "px";
 
-          // Random floating movement
-          const moveHeart = () => {
-            x += (Math.random() - 0.5) * 80;
-            y += (Math.random() - 0.5) * 80;
+          // Random velocities and rotation
+          let speedFactor = 4; // base speed, increase to make faster
+          heart.vx = (Math.random() - 0.5) * speedFactor;
+          heart.vy = (Math.random() - 0.5) * speedFactor;
+          let rotation = Math.random() * 360;
+          let vRotation = (Math.random() - 0.5) * 4; // rotation speed
 
-            // Keep inside area
-            x = Math.max(0, Math.min(areaWidth - 40, x));
-            y = Math.max(0, Math.min(areaHeight - 40, y));
+          // Smooth animation with easing/swirl
+          function animate() {
+            x += heart.vx;
+            y += heart.vy;
+            rotation += vRotation;
 
+            // Bounce inside area
+            if (x <= 0 || x >= areaWidth - 40) heart.vx = -heart.vx;
+            if (y <= 0 || y >= areaHeight - 40) heart.vy = -heart.vy;
+
+            // Apply smooth transform
             heart.style.left = x + "px";
             heart.style.top = y + "px";
-          };
+            heart.style.transform = `rotate(${rotation}deg)`;
 
-          const interval = setInterval(moveHeart, 800 + Math.random() * 700);
+            requestAnimationFrame(animate);
+          }
 
+          requestAnimationFrame(animate);
+
+          // Click behavior
           heart.onclick = () => {
-            clearInterval(interval);
             heart.remove();
             count++;
             dadScore += 5;
             updateScore();
             document.getElementById("counter").innerText = `${count} / 10`;
-            if (count === 10) showGift("Refrigerator");
+
+            // Increase speed of remaining hearts slightly
+            const remainingHearts = document.querySelectorAll(".moving-heart");
+            remainingHearts.forEach((h) => {
+              h.vx *= 1.1;
+              h.vy *= 1.1;
+              h.style.transition = "transform 0.2s"; // optional visual boost
+            });
+
+            if (count === 10) {
+              showFireworksInGameArea();
+              setTimeout(() => showGift("Refrigerator"), 800);
+            }
           };
 
           area.appendChild(heart);
         }
       }
-      /* LEVEL 4 */
+
       function showNotes() {
         game.innerHTML = `
-                          <h2>🧠 Dad Skills Training</h2>
-                          <p>Click all the love notes 💌</p>
-                          <div id="notes"></div>
-                          <div id="nextBtn"></div>
-                        `;
+            <h2>🧠 Dad Skills Training</h2>
+            <p>Tap the cards to reveal love notes 💌</p>
+            <div id="notes"></div>
+            <div id="nextBtn"></div>
+        `;
+
         const notes = [
           "I’ve got you ❤️",
           "We’re a team",
@@ -510,25 +700,41 @@
           "You’re never alone 💕",
         ];
 
-        notes.forEach((n) => {
-          const btn = document.createElement("button");
-          btn.innerText = "💌";
-          btn.onclick = () => {
-            btn.innerText = n;
-            btn.disabled = true;
+        notes.forEach((text) => {
+          const card = document.createElement("div");
+          card.className = "flip-card";
+
+          card.innerHTML = `
+            <div class="flip-card-inner">
+                <div class="flip-card-front">💌</div>
+                <div class="flip-card-back">${text}</div>
+            </div>
+            `;
+
+          card.onclick = () => {
+            if (card.classList.contains("flipped")) return;
+
+            card.classList.add("flipped");
             dadScore += 10;
             updateScore();
+
+            // Check if all cards are flipped
             if (
-              [...document.querySelectorAll("#notes button")].every(
-                (b) => b.disabled,
+              [...document.querySelectorAll(".flip-card")].every((c) =>
+                c.classList.contains("flipped"),
               )
             ) {
-              document.getElementById("nextBtn").innerHTML =
-                `<p>🎁 Congrats! Collect your reward from: <b>Bookshelf</b></p>
-                                 <button onclick="nextLevel()">Next ➡️</button>`;
+              showFireworksInGameArea();
+              setTimeout(() => {
+                document.getElementById("nextBtn").innerHTML = `
+                  <p>🎁 Congrats! Collect your reward from: <b>Bookshelf</b></p>
+                  <button onclick="nextLevel()">Next ➡️</button>
+                  `;
+              }, 800);
             }
           };
-          document.getElementById("notes").appendChild(btn);
+
+          document.getElementById("notes").appendChild(card);
         });
       }
 
@@ -536,14 +742,14 @@
       function showReflex() {
         /* LEVEL 5 – DAD REFLEX CHALLENGE (Teleport + Speed Up) */
         game.innerHTML = `
-        <h2>🎯 Dad Reflex Challenge</h2>
-        <p>Catch the baby 👶 5 times!</p>
-        <div id="playArea" style="position:relative; height:260px;">
-          <div id="baby">👶</div>
-        </div>
-        <p id="hits">0 / 5</p>
-        <p class="small">👶 He’s getting quicker…</p>
-      `;
+            <h2>🎯 Dad Reflex Challenge</h2>
+            <p>Catch the baby 👶 5 times!</p>
+            <div id="playArea" style="position:relative; height:260px;">
+            <div id="baby">👶</div>
+            </div>
+            <p id="hits">0 / 5</p>
+            <p class="small">👶 He’s getting quicker…</p>
+        `;
 
         let hits = 0;
         let delay = 750; // starting speed (ms)
@@ -570,11 +776,17 @@
 
           document.getElementById("hits").innerText = `${hits} / 5`;
 
-          delay = Math.max(180, delay - 180); // speed up
-          teleportBaby();
+          // Teleport to new position
+          baby.style.left = Math.random() * 80 + "%";
+          baby.style.top = Math.random() * 60 + "%";
+
+          // Wiggle on teleport
+          baby.classList.add("wiggle");
+          setTimeout(() => baby.classList.remove("wiggle"), 1000);
 
           if (hits === 5) {
-            setTimeout(showFinal, 500);
+            showFireworksInGameArea();
+            setTimeout(showFinal, 800);
           }
         };
 
@@ -588,58 +800,58 @@
       /* GIFT SCREEN */
       function showGift(location) {
         game.innerHTML = `
-                          <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
-                          <button onclick="nextLevel()">Next ➡️</button>
-                        `;
+            <p>🎁 Congrats! Collect your reward from: <strong>${location}</strong></p>
+            <button onclick="nextLevel()">Next ➡️</button>
+            `;
       }
 
       /* FINAL */
       function showFinal() {
         game.innerHTML = `
-                          <h2>💝 Happy Valentine’s Day</h2>
-                          <p>
-                            Final Dad Score: <strong>${dadScore}</strong> 👑<br>
-                            <strong>${dadGrade(dadScore)}</strong><br>
-                            <div class="heart-pulse">❤️</div>
-                            We love you so much 💖👶
-                          </p>
-                          <p>🎁 Congrats! Collect Final reward from: <strong>Study table</strong></p>
+            <h2>💝 Happy Valentine’s Day</h2>
+            <p>
+                Final Dad Score: <strong>${dadScore}</strong> 👑<br>
+                <strong>${dadGrade(dadScore)}</strong><br>
+                <div class="heart-pulse">❤️</div>
+                We love you so much 💖👶
+            </p>
+            <p>🎁 Congrats! Collect Final reward from: <strong>Study table</strong></p>
 
-                          <p class="small">A letter just for you 💌</p>
+            <p class="small">A letter just for you 💌</p>
 
 
-                        <div class="envelope" id="envelope">✉️</div>
+            <div class="envelope" id="envelope">✉️</div>
 
-                        <div id="letterOverlay" class="letter-overlay">
-                        <div class="letter-card">
-                            <h3>My Toni,</h3>
+            <div id="letterOverlay" class="letter-overlay">
+            <div class="letter-card">
+                <h3>My Toni,</h3>
 
-                            <p>
-                            From the moment we found out about this tiny heartbeat,
-                            I saw a new strength in you — calm, steady and full of love that already protects us.
-                            </p>
+                <p>
+                From the moment we found out about this tiny heartbeat,
+                I saw a new strength in you — calm, steady and full of love that already protects us.
+                </p>
 
-                            <p>
-                            You make this journey feel safe.
-                            You listen, you plan, you care in ways that matter.
-                            Our baby is already so lucky to have you.
-                            </p>
+                <p>
+                You make this journey feel safe.
+                You listen, you plan, you care in ways that matter.
+                Our baby is already so lucky to have you.
+                </p>
 
-                            <p>
-                            Thank you for being my partner, my comfort
-                            and the man I trust with our whole world.
-                            </p>
+                <p>
+                Thank you for being my partner, my comfort
+                and the man I trust with our whole world.
+                </p>
 
-                            <p>
-                            We choose you — every day, in every way. 💖👶
-                            </p>
+                <p>
+                We choose you — every day, in every way. 💖👶
+                </p>
 
-                            <p><strong>Happy Valentine’s Day.</strong></p>
+                <p><strong>Happy Valentine’s Day.</strong></p>
 
-                            <div class="close-letter">(Tap anywhere to close)</div>
-                        </div>
-                    </div>
-                        `;
+                <div class="close-letter">(Tap anywhere to close)</div>
+            </div>
+        </div>
+            `;
 
         const envelope = document.getElementById("envelope");
         const overlay = document.getElementById("letterOverlay");
